@@ -43,6 +43,7 @@ object BuildSettings {
     scalaVersion := buildScalaVersion,
     scalaBinaryVersion := CrossVersion.binaryScalaVersion(buildScalaVersion),
     ivyLoggingLevel := UpdateLogging.DownloadOnly,
+    credentials := Seq(Credentials(Path.userHome / ".ivy2" / ".credentials")),
     publishTo := Some(publishingMavenRepository),
     javacOptions ++= Seq("-source", "1.6", "-target", "1.6", "-encoding", "UTF-8", "-Xlint:-options"),
     javacOptions in doc := Seq("-source", "1.6"),
@@ -101,6 +102,7 @@ object BuildSettings {
       .settings(
         scalaVersion := buildScalaVersionForSbt,
         scalaBinaryVersion := CrossVersion.binaryScalaVersion(buildScalaVersionForSbt),
+        credentials := Seq(Credentials(Path.userHome / ".ivy2" / ".credentials")),
         publishTo := Some(publishingMavenRepository),
         publishArtifact in packageDoc := false,
         publishArtifact in (Compile, packageSrc) := true,
@@ -116,8 +118,8 @@ object Resolvers {
   val typesafeSnapshots = "Typesafe Snapshots Repository" at "http://repo.typesafe.com/typesafe/snapshots/"
   val typesafeIvyReleases = Resolver.url("Typesafe Ivy Releases Repository", url("http://repo.typesafe.com/typesafe/ivy-releases"))(Resolver.ivyStylePatterns)
   val typesafeIvySnapshots = Resolver.url("Typesafe Ivy Snapshots Repository", url("http://repo.typesafe.com/typesafe/ivy-snapshots"))(Resolver.ivyStylePatterns)
-  val publishTypesafeMavenReleases = "Typesafe Maven Releases Repository for publishing" at "https://private-repo.typesafe.com/typesafe/maven-releases/"
-  val publishTypesafeMavenSnapshots = "Typesafe Maven Snapshots Repository for publishing" at "https://private-repo.typesafe.com/typesafe/maven-snapshots/"
+  val publishTypesafeMavenReleases = "Typesafe Maven Releases Repository for publishing" at "http://maven.pd.local/content/repositories/thirdparty"
+  val publishTypesafeMavenSnapshots = "Typesafe Maven Snapshots Repository for publishing" at "http://maven.pd.local/content/repositories/snapshots"
   val publishTypesafeIvyReleases = Resolver.url("Typesafe Ivy Releases Repository for publishing", url("https://private-repo.typesafe.com/typesafe/ivy-releases/"))(Resolver.ivyStylePatterns)
   val publishTypesafeIvySnapshots = Resolver.url("Typesafe Ivy Snapshots Repository for publishing", url("https://private-repo.typesafe.com/typesafe/ivy-snapshots/"))(Resolver.ivyStylePatterns)
 
@@ -235,7 +237,7 @@ object PlayBuild extends Build {
   lazy val SbtPluginProject = PlaySbtProject("SBT-Plugin", "sbt-plugin")
     .settings(
       sbtPlugin := true,
-      publishMavenStyle := false,
+      publishMavenStyle := true,
       libraryDependencies := sbtDependencies,
       sbtVersion in GlobalScope := buildSbtVersion,
       sbtBinaryVersion in GlobalScope := buildSbtVersionBinaryCompatible,
@@ -247,7 +249,7 @@ object PlayBuild extends Build {
           d.organization + ":" + d.name + ":" + d.revision
         }.sorted.foreach(println)
       },
-      publishTo := Some(publishingIvyRepository),
+      publishTo := Some(publishingMavenRepository),
       // Must be false, because due to the way SBT integrates with test libraries, and the way SBT uses Java object
       // serialisation to communicate with forked processes, and because this plugin will have SBT 0.13 on the forked
       // processes classpath while it's actually being run by SBT 0.12... if it forks you get serialVersionUID errors.
